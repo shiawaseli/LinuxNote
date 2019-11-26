@@ -1,0 +1,14 @@
+总用量 56
+drwxrwxr-x. 5 test test    47 11月 20 20:20 bin
+drwxrwxr-x. 5 test test    46 11月 14 17:54 CZL-master
+-rw-r--r--. 1 test test 53201 10月 21 22:22 gcc.PNG
+-rw-rw-r--. 1 test test   827 11月 15 17:47 install.sh
+drwxrwxr-x. 3 test test   215 11月 21 00:31 tmp
+drwxrwxr-x. 7 test test    89 11月 21 00:25 workdir
+总用量 4
+drwxrwxr-x. 5 test test  63 11月 19 23:58 bite
+drwxrwxr-x. 3 test test  57 11月 21 16:12 cmdLine
+drwxrwxr-x. 3 test test  44 11月 20 19:05 GNUmake
+drwxrwxr-x. 3 test test  37 11月 20 00:10 linuxC
+-rw-rw-r--. 1 test test 347 11月 20 20:55 makefile
+drwxrwxr-x. 2 test test  33 11月 13 22:47 tmp

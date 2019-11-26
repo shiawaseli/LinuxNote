@@ -1,0 +1,2 @@
+ls: 无法访问ahld: 没有那个文件或目录
+ls: 无法访问jfsalidjflia: 没有那个文件或目录

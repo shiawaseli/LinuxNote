@@ -1,0 +1,7 @@
+总用量 0
+drwxrwxr-x. 2 test test 6 11月 21 18:16 Desktop
+drwxrwxr-x. 2 test test 6 11月 21 18:16 Documents
+drwxrwxr-x. 2 test test 6 11月 21 18:16 Music
+-rw-rw-r--. 1 test test 0 11月 21 18:16 output.txt
+drwxrwxr-x. 2 test test 6 11月 21 18:16 Pictures
+drwxrwxr-x. 2 test test 6 11月 21 18:16 Videos

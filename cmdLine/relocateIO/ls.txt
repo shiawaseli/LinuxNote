@@ -1,0 +1,9 @@
+lazy_dog.txt
+ls-output.txt
+ls-re-stderr.txt
+movie.mpeg
+movie.mpeg.001
+movie.mpeg.002
+movie.mpeg.003
+movie.mpeg.004
+movie.mpeg.005

@@ -1,0 +1,230 @@
+                    shell扩展和引用
+
+扩展(expansion)
+    
+1、路径名扩展
+    
+    【*】【[.]】【?】等
+    通过通配符实现的扩展机制
+
+        [test@localhost tmp]$ ls
+        Desktop  Documents  Music  output.txt  Pictures  Videos
+        [test@localhost tmp]$ echo D*
+        Desktop Documents
+        [test@localhost tmp]$ echo *s
+        Documents Pictures Videos
+        [test@localhost tmp]$ echo [[:upper:]]*
+        Desktop Documents Music Pictures Videos
+        [test@localhost tmp]$ echo /usr/*/share
+        /usr/local/share
+
+    对于隐藏文件的路径名扩展:
+
+        [test@localhost tmp]$ echo .*
+        . .. .vimrc
+        [test@localhost tmp]$ ls -d .*
+        .  ..  .vimrc
+        [test@localhost tmp]$ ls -d .[!.]?*
+        .vimrc
+
+2、波浪线扩展
+
+    【~用户名】
+    扩展为指定用户的主目录名，默认为当前用户主目录
+
+        [test@localhost tmp]$ echo ~
+        /home/test
+        [test@localhost tmp]$ echo ~dev
+        /home/dev
+
+3、算术扩展
+
+    【$((expression))】
+    支持整数的加(+)减(-)乘(*)除(/)取余(%)和取幂(**)
+
+        [test@localhost tmp]$ echo $((2 + 2))
+        4
+        [test@localhost tmp]$ echo $(($((5**2)) * 3))
+        75
+        [test@localhost tmp]$ echo $(((5**2) * 3))
+        75
+        [test@localhost tmp]$ echo Five divided by two squals $((5/2))
+        Five divided by two squals 2
+        [test@localhost tmp]$ echo with $((5%2)) left over
+        with 1 left over
+
+4、花括号扩展
+
+    【{a,b,c}】【{a..c}】
+    利用花括号里的模式，扩展出相应的字符串
+
+        [test@localhost tmp]$ echo Front-{A,B,C}-Back
+        Front-A-Back Front-B-Back Front-C-Back
+        [test@localhost tmp]$ echo Number_{1..5}
+        Number_1 Number_2 Number_3 Number_4 Number_5
+        [test@localhost tmp]$ echo {Z..A}
+        Z Y X W V U T S R Q P O N M L K J I H G F E D C B A
+        [test@localhost tmp]$ echo a{A{1,2},B{3,4}}b
+        aA1b aA2b aB3b aB4b
+
+    应用:
+        
+        [test@localhost tmp]$ mkdir Pics
+        [test@localhost tmp]$ cd Pics
+        [test@localhost Pics]$ mkdir {2018..2020}-{0{1..9},{10..12}}
+        [test@localhost Pics]$ ls
+        2018-01  2018-07  2019-01  2019-07  2020-01  2020-07
+        2018-02  2018-08  2019-02  2019-08  2020-02  2020-08
+        2018-03  2018-09  2019-03  2019-09  2020-03  2020-09
+        2018-04  2018-10  2019-04  2019-10  2020-04  2020-10
+        2018-05  2018-11  2019-05  2019-11  2020-05  2020-11
+        2018-06  2018-12  2019-06  2019-12  2020-06  2020-12
+
+5、参数扩展
+
+    【$变量】，将变量扩展为对应的字符串
+
+        [test@localhost tmp]$ echo $USER
+        test
+
+    查看变量列表
+        [test@localhost tmp]$ printenv | less
+
+    当输入不存在扩展项的变量时，仍会进行扩展为空字符串(其他扩展规则将不会进行扩展)
+
+        [test@localhost tmp]$ echo $SUER
+        (空字符串)
+        [test@localhost tmp]$ (等待输入)
+
+6、命令替换
+
+    【$(命令)】
+    将命令的输出作为一个扩展模式
+
+        [test@localhost tmp]$ echo $(ls)
+        Desktop Documents Music output.txt Pics Pictures Videos
+        [test@localhost tmp]$ ls -l $(which cp)
+        -rwxr-xr-x. 1 root root 155168 11月  6 2016 /usr/bin/cp
+
+    也可用于管道:
+        
+        [test@localhost tmp]$ file $(ls | grep txt)
+        output.txt: UTF-8 Unicode text
+
+7、单词分割
+
+    空白分隔的参数直接只会保留一个空格
+
+        [test@localhost tmp]$ echo this is a     test
+        this is a test
+
+    $1 被扩展为空字符串，相当于被忽略
+
+        [test@localhost tmp]$ echo the total is $100.00
+        the total is 00.00
+        [test@localhost tmp]$ echo the total is$100.00
+        the total is00.00
+
+
+引用(quoing)
+    
+1、双引号
+    
+    除"$"  "\"  "'"，shell的特殊字符都将被看作普通字符
+    单词分隔、路径名扩展、波浪线扩展、花括号扩展都将失效
+    参数扩展、算数扩展、命令替换依旧有效
+
+        [test@localhost tmp]$ touch "two words.txt"
+        [test@localhost tmp]$ ls
+        Desktop    Music       Pics      two words.txt
+        Documents  output.txt  Pictures  Videos
+        [test@localhost tmp]$ ls -l two words.txt
+        ls: 无法访问two: 没有那个文件或目录
+        ls: 无法访问words.txt: 没有那个文件或目录
+        [test@localhost tmp]$ ls -l "two words.txt"
+        -rw-rw-r--. 1 test test 0 11月 21 18:55 two words.txt
+
+    可以借用双引号指定有特殊符号的文件名:
+
+        [test@localhost tmp]$ mv "two words.txt" two_words.txt 
+        [test@localhost tmp]$ ls
+        Desktop    Music       Pics      two_words.txt
+        Documents  output.txt  Pictures  Videos
+
+    参数扩展、算术扩展和命令替换亦然生效:
+
+        [test@localhost tmp]$ echo "$USER $((2 + 2)) $(cal)"
+        test 4      十一月 2019    
+        日 一 二 三 四 五 六
+                        1  2
+         3  4  5  6  7  8  9
+        10 11 12 13 14 15 16
+        17 18 19 20 21 22 23
+        24 25 26 27 28 29 30
+
+    会忽略单词分割:
+
+        [test@localhost tmp]$ echo this is a     test
+        this is a test
+        [test@localhost tmp]$ echo "this is a     test"
+        this is a     test
+
+    双引号使其中的内容作为一个整体:
+
+        [test@localhost tmp]$ echo $(cal)
+        十一月 2019 日 一 二 三 四 五 六 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+        [test@localhost tmp]$ echo "$(cal)"
+             十一月 2019    
+        日 一 二 三 四 五 六
+                        1  2
+         3  4  5  6  7  8  9
+        10 11 12 13 14 15 16
+        17 18 19 20 21 22 23
+        24 25 26 27 28 29 30
+
+2、单引号
+
+    忽略所有的扩展
+
+    引用效果对比:
+
+        [test@localhost tmp]$ echo text ~/tmp/*.txt {a,b} $(echo foo) $((2 + 2)) $USER
+        text /home/test/tmp/output.txt /home/test/tmp/two_words.txt a b foo 4 test
+        [test@localhost tmp]$ echo "text ~/tmp/*.txt {a,b} $(echo foo) $((2 + 2)) $USER"
+        text ~/tmp/*.txt {a,b} foo 4 test
+        [test@localhost tmp]$ echo 'text ~/tmp/*.txt {a,b} $(echo foo) $((2 + 2)) $USER'
+        text ~/tmp/*.txt {a,b} $(echo foo) $((2 + 2)) $USER
+
+
+3、转义字符
+
+   当要引用单个字符时，可以通过在字符前加反斜杠来实现
+   经常用于双引号中选择性地组织进行扩展，单引号中无效
+
+        [test@localhost tmp]$ echo "The balance for user $USER is \$5.00"
+        The balance for user test is $5.00
+
+    也可以使文件名中的特殊字符转义为普通字符
+
+        [test@localhost tmp]$ touch bad\&filename
+        [test@localhost tmp]$ ls
+        bad&filename  Music       Pictures
+        Desktop       output.txt  two_words.txt
+        Documents     Pics        Videos
+        [test@localhost tmp]$ mv bad\&filename good_filename
+        [test@localhost tmp]$ ls
+        Desktop        Music       Pictures
+        Documents      output.txt  two_words.txt
+        good_filename  Pics        Videos
+
+    在echo中使用转义字符(-e "\n" OR $'\n'):
+
+        [test@localhost tmp]$ sleep 5; echo -e "Time's up\n"
+        Time's up
+        (空字符串)
+        [test@localhost tmp]$ sleep 5; echo "Time's up" $'\n'
+        Time's up 
+        (空字符串)       
+        [test@localhost tmp]$ (等待输入)
+
+

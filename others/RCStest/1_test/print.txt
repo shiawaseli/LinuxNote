@@ -1,0 +1,28 @@
+[test@localhost 1_test]$ touch foo.y
+[test@localhost 1_test]$ make -n foo
+yacc  foo.y 
+mv -f y.tab.c foo.c
+cc    -c -o foo.o foo.c
+cc   foo.o   -o foo
+rm foo.c foo.o
+
+
+[test@localhost 1_test]$ ci foo.y 
+foo.y,v  <--  foo.y
+enter description, terminated with single '.' or end of file:
+NOTE: This is NOT the log message!
+>> .
+initial revision: 1.1
+done
+[test@localhost 1_test]$ ls
+foo.y,v  print.txt
+[test@localhost 1_test]$ make -n foo >> print.txt
+co  foo.y,v foo.y
+foo.y,v  -->  foo.y
+revision 1.1
+done
+yacc  foo.y 
+mv -f y.tab.c foo.c
+cc    -c -o foo.o foo.c
+cc   foo.o   -o foo
+rm foo.c foo.o foo.y

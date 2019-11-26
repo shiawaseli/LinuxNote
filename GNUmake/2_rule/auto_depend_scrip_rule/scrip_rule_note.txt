@@ -1,0 +1,47 @@
+
+%.d: %.c
+    $(CC) -M $(CPPFLAGS) $< > $@.$$$$;
+    sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@
+    rm -f $@.$$$$
+功能：
+    将目的文件(可执行文件)加入到gcc -M生成的依赖关系中
+
+    's,\($*\)\.o[ :]*,\1.o $@ : ,g'
+    
+逗号作为分隔符:
+    's,                             开头
+
+    \($*\)\.o[ :]*,                 
+        搜索部分:
+            $*      -> 工作目标的主文件名
+            \(\)    -> 括号中为正则表达式(RE)
+            \.o     -> 扩展名
+            [ :]*   -> 工作目标的文件名后的零个或多个空格或冒号
+
+    \1.o $@ : ,                     
+        替换部分:
+            \1.o    -> 通过引用第一个RE分组来恢复最初的工作目标并加上扩展名
+            $@      -> 依存文件工作目标
+
+    g'                              结尾
+
+->  
+s,($*).o[ :]*,\1.o $@ : ,g
+
+
+gcc -M -I ../include counter.c > counter.$$$$
+
+ll
+总用量 12
+-rw-rw-r--. 1 test test  91 11月 22 21:41 counter.2655226552
+-rw-rw-r--. 1 test test 220 11月 22 21:40 counter.c
+-rw-rw-r--. 1 test test  46 11月 22 21:43 scrip_rule_note.txt
+
+sed 's,\($*\)\.o[ : ]*,\1.o counter : ,g' < counter.$$$$ > counter.d
+
+ll
+总用量 16
+-rw-rw-r--. 1 test test  91 11月 22 21:41 counter.2655226552
+-rw-rw-r--. 1 test test 220 11月 22 21:40 counter.c
+-rw-rw-r--. 1 test test 100 11月 22 21:45 counter.d
+-rw-rw-r--. 1 test test 312 11月 22 21:48 scrip_rule_note.txt

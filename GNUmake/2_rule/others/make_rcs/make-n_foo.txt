@@ -1,0 +1,6 @@
+co  foo.y,v foo.y
+yacc  foo.y 
+mv -f y.tab.c foo.c
+cc    -c -o foo.o foo.c
+cc   foo.o   -o foo
+rm foo.c foo.o foo.y
