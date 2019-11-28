@@ -1,0 +1,17 @@
+标准的 make 变量
+MAKE_VERSION:
+    GNU make 的版本编号
+CURDIR:
+    正在执行 make 进程的当前工作目录，从 shell 变量 PWD 获取
+    -C directory-name / --directory=directory-name 修改 CURDIR
+MAKEFILE_LIST:
+    make 所读进的各个 makefile 文件的名称所构成的列表，
+    包括默认的 makefile 以及命令行或 include 指令指定的 makefile
+MAKECMDGOALS:
+    make 运行时在命令行上指定的工作目标
+    当 clean 时，不应当还使用 include 引入文件，可以这样解决
+        ifneq "$(MAKECMDGOALS)" "clean"
+            -include $(subst .xml,.d,$(xml_src))
+        endif
+.VARIABLES:
+    目前为止，make 所有的变量所构成的列表，不含工作目标的专属变量
