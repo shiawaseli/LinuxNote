@@ -1,16 +1,17 @@
 # makefile socket 
 
-src=server.c client.c
-bin=server client 
+src=server.c client.c wrap.c
+bin=server client  
 save_path=~/bin/linuxC/
+CPPFLAGS=-g
 
 all: $(bin) 
 
-server: server.c
-	gcc $^ -o $@ -lpthread 
+server: server.o wrap.o
+	gcc $^ -o $@ -lpthread $(CPPFLAGS)
 	cp $@ $(save_path)
-client: client.c
-	gcc $^ -o $@ -lpthread 
+client: client.o wrap.o
+	gcc $^ -o $@ -lpthread $(CPPFLAGS) 
 	cp $@ $(save_path)
 clean:
 	cd $(save_path) && rm -f $(bin)

@@ -1,11 +1,8 @@
 /* client.c */ 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include "wrap.h"
 
 #define MAXLINE 80
 #define SERV_PORT 8000
@@ -23,21 +20,20 @@ int main(int argc, char *argv[])
     }
     str = argv[1];
 
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    sockfd = Socket(AF_INET, SOCK_STREAM, 0);
 
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     inet_pton(AF_INET, "127.0.0.1", &servaddr.sin_addr);
     servaddr.sin_port = htons(SERV_PORT);
-    connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
+    Connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
     
-    write(sockfd, str, strlen(str));
+    Write(sockfd, str, strlen(str));
 
-    n = read(sockfd, buf, MAXLINE);
-    buf[strlen(buf) - 1] = '\n';
-    printf("Response from server:\n");
-    write(STDOUT_FILENO, buf, n);
+    n = Read(sockfd, buf, MAXLINE);
+    buf[n] = '\0';
+    printf("Response from server:%s\n", buf);
 
-    close(sockfd);
+    Close(sockfd);
     return 0;
 }
