@@ -12,32 +12,32 @@ int main(void)
 {
     struct sockaddr_in servaddr, cliaddr;
     socklen_t cliaddr_len;
-    int listenfd, connfd;
+    int sockfd;
     char buf[MAXLINE];
     char str[INET_ADDRSTRLEN];
     int i, n;
 
-    listenfd = Socket(AF_INET, SOCK_STREAM, 0);
+    sockfd = Socket(AF_INET, SOCK_DGRAM, 0);
 
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(SERV_PORT);
 
-    Bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
-    Listen(listenfd, 20);
+    Bind(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
     printf("Accepting connections ...\n");
     while (1) {
         cliaddr_len = sizeof(cliaddr);
-        connfd = Accept(listenfd, (struct sockaddr*)&cliaddr, &cliaddr_len);
-        n = Read(connfd, buf, MAXLINE);
+        n = recvfrom(sockfd, buf, MAXLINE, 0, (struct sockaddr*)&cliaddr, &cliaddr_len);
+        if (n == -1)
+            perr_exit("recvfrom error");
         printf("received from %s at PORT %d\n",
                 inet_ntop(AF_INET, &cliaddr.sin_addr, str, sizeof(str)), ntohs(cliaddr.sin_port));
-        for (i = 0; i < n; i++) {
+        for (i = 0; i < n; i++)
             buf[i] = toupper(buf[i]);
-        }
-        Write(connfd, buf, n);
-        Close(connfd);
+        n = sendto(sockfd, buf, n, 0, (struct sockaddr*)&cliaddr, sizeof(cliaddr));
+        if (n == -1)
+            perr_exit("sendto error");
     }
     return 0;
 }
