@@ -11,12 +11,12 @@
 
 int main()
 {
-    int n, connfd;
+    int n, sockfd;
     struct sockaddr_in servaddr;
     char buf[MAXLINE], input[MAXLINE];
 
-    connfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (connfd < 0) {
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
         perror("socket error");
         exit(1);
     }
@@ -26,7 +26,8 @@ int main()
     inet_pton(AF_INET, "127.0.0.1", &servaddr.sin_addr);
     servaddr.sin_port = htons(SERV_PORT);
 
-    connect(connfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
+    connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
+    printf("input(/*):>");
     while (fgets(input, MAXLINE, stdin) != NULL) {
         input[strlen(input) - 1] = '\0';
         if (input[0] != '/')
@@ -36,14 +37,18 @@ int main()
         }
         memset(buf, 0, MAXLINE);
         sprintf(buf, "GET %s HTTP/1.1\r\n\r\n", input);
-        write(connfd, buf, strlen(buf));
-        n = read(connfd, buf, MAXLINE);
-        if (n == 0)
-            printf("the other side has been closed.\n");
-        else 
-            printf("%s\n", buf);
+        write(sockfd, buf, strlen(buf));
+        char *tmp;
+        while ((n = read(sockfd, buf, MAXLINE)) > 0) {
+            if ((tmp = strstr(buf, "FIN\n")) != NULL)
+                break;
+            printf("%s", buf);
+            memset(buf, 0, MAXLINE);
+        }
+        *tmp = '\0';
+        printf("%s", buf);
+        printf("input(/*):>");
     }
-    printf("??????? %s ?????????\n", input);
-    close(connfd);
+    close(sockfd);
     return 0;
 }

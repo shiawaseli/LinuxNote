@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
+#include <ctype.h>
 #include <wait.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -16,6 +17,7 @@ int server(int connfd)
     int i, j, n, fd;
     char path[MAXLINE], http[MAXLINE], buf[MAXLINE], contentType[MAXLINE];
 
+    printf("server starting\n");
     while (1) {
         n = read(connfd, buf, MAXLINE);
         if (n == 0) {
@@ -25,18 +27,18 @@ int server(int connfd)
         if (n > 2 && buf[0] == 'G' && buf[1] == 'E' && buf[2] == 'T') {
             for (i = 3; i < n && buf[i] == ' '; )
                 i++;
-            for (j = 0; i < n && buf[i] != ' '; j++)
-                path[j] = buf[i];
-            path[j] = '\0';
+            for (j = 0; i < n && buf[i] != ' '; )
+                buf[j++] = buf[i++];
+            buf[j] = '\0';
             for (; i < n && buf[i] == ' '; )
                 i++;
-            for (j = 0; i < n && buf[i] != ' '; j++)
-                http[j] = buf[i];
+            for (j = 0; i < n && !isspace(buf[i]); )
+                http[j++] = buf[i++];
             http[j] = '\0';
-            if (strcmp(path, "/") == 0)
+            if (strcmp(buf, "/") == 0)
                 sprintf(path, "%s/index.html", WEB_PATH);
             else 
-                sprintf(path, "%s%s", WEB_PATH, path);
+                sprintf(path, "%s%s", WEB_PATH, buf);
             if (strstr(path, "jpg") != NULL)
                 sprintf(contentType, "image/jpg");
             else if (strstr(path, "png") != NULL)
@@ -53,9 +55,12 @@ int server(int connfd)
             } else {
                 sprintf(buf, "%s 404 Not Found\r\nContent-Type: %s\r\n\r\n", http, contentType);
                 write(connfd, buf, sizeof(buf));
-                sprintf(buf, "<html><body>request file not found</body></html>");
+                sprintf(buf, "<html><body>request file not found</body></html>\r\n");
                 write(connfd, buf, sizeof(buf));
             }
+            sprintf(buf, "FIN\n");
+            write(connfd, buf, strlen(buf));
+            close(fd);
         }
     }
     return 0;
@@ -80,7 +85,12 @@ int main(void)
     listen(listenfd, 20);
     while (1) {
         cliaddr_len = sizeof(cliaddr);
-        waitpid(-1, NULL, WNOHANG);
+        connfd =  waitpid(-1, NULL, WNOHANG);
+        if (connfd > 0)
+        {
+            close(connfd);
+            printf("close connfd parent\n");
+        } 
         connfd = accept(listenfd, (struct sockaddr*)&cliaddr, &cliaddr_len);
         pid = fork();
         if (pid < 0) {
@@ -91,8 +101,6 @@ int main(void)
             server(connfd);
             close(connfd);
             exit(0);
-        } else {
-            close(connfd);
         }
     }
     return 0;
