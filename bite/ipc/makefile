@@ -1,18 +1,20 @@
-# makefile basicIO
-
-src = io_review.c io_sysio.c io_redirect.c 
-bin = io_review io_sysio io_redirect
+# makefile ipc
+src = pipe.c pipe2.c fifo_read.c fifo_write.c
+bin = pipe pipe2 fifo_read fifo_write
 save_path = ~/bin/bite/
 
 all: $(bin) 
 
-io_redirect: io_redirect.c
+pipe: pipe.c
 	gcc $^ -o $@
 	cp $@ $(save_path)
-io_sysio: io_sysio.c
+pipe2: pipe2.c
 	gcc $^ -o $@
 	cp $@ $(save_path)
-io_review: io_review.c
+fifo_read: fifo_read.c
+	gcc $^ -o $@
+	cp $@ $(save_path)
+fifo_write: fifo_write.c
 	gcc $^ -o $@
 	cp $@ $(save_path)
 

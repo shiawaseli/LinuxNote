@@ -1,0 +1,23 @@
+动态库:
+    gcc -fPIC -c print.c -o print.o
+    gcc --share print.o -o libmyprint.so
+静态库:
+    gcc -c print.c -o print.o
+    ar -cr libmyprint.a print.o
+
+使用:
+    在生成可执行程序的时候连接使用
+    在运行可执行程序的时候加载使用(仅针对动态链接生成的可执行程序)
+
+生成可执行程序链接时使用库; 库文件的搜索路径时默认的路径/lib64
+1、将库文件放置到指定的路径下
+2、设置环境变量LIBRARY_PATH，将库文件所在目录的路径添加到这个环境变量的值中
+3、使用gcc -L选项，告诉gcc库文件的搜索路径，gcc main.c -o main -L ./ -lmyprint
+
+运行时使用: 运行时加载库文件，也会去默认的搜索路径下去找库文件/lib64
+1、将库文件放置到指定的路径下
+2、设置环境变量LD_LIBRARY_PATH export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):./
+
+通常使用静态库时，并不是使用-static去指定gcc进行静态链接，因为-static的功能是在生成可执行程序的时候，所有的依赖库都是使用静态库，而不是仅仅指定的那个库; 
+通常在链接一个静态库时，都是将这个静态库放到指定路径下，就会直接链接这个静态库，而其它的依赖库仍会使用动态链接
+
