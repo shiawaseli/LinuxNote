@@ -29,7 +29,6 @@ void* thr_tout(void *arg)
         } else {
             // 加锁之后再任意有可能退出线程的地方都要解锁
             // pthread_mutex_unlock(&mutex);
-            pthread_mutex_
             printf("tout: %p - exit\n", (unsigned long*)pthread_self());
             pthread_exit(NULL);
         }
