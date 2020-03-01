@@ -1,7 +1,7 @@
 # makefile thread
 
-src = create.c tout.c cond.c pro_con.cpp con_pro.cpp 
-bin = create tout cond pro_con con_pro 
+src = create.c tout.c cond.c pro_con.cpp con_pro.cpp threadPool.cpp
+bin = create tout cond pro_con con_pro threadPool
 save_path = ~/bin/bite/
 CPPFLAGS += -lpthread # or -pthread
 
@@ -22,6 +22,8 @@ pro_con: pro_con.cpp
 con_pro: con_pro.cpp
 	g++ $(CPPFLAGS) -o $@ $^
 	cp $@ $(save_path)
+threadPool: threadPool.cpp
+	g++ $(CPPFLAGS) -o $@ $^
 
 clean:
 	cd $(save_path) && rm -f $(bin)
