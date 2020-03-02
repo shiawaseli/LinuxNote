@@ -181,3 +181,6 @@ ifeq "$(strip $(OPTIONS))" "-d"
 	COMPILATION_FLAGS += -DDEBUG
 endif 
 
+clean:
+	@echo "no action"
+.PHONY: clean

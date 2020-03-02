@@ -19,6 +19,6 @@ libmyIPC.so: cli_conn.o serv_listen.o serv_accept.o serv_bind.o
 	gcc -fPIC -c $< -g
 clean:
 	cd $(save_path) && rm -f $(bin)
-	rm -f $(bin)
+	rm -f *.o $(bin)
 .PHONY: clean
 
