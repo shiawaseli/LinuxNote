@@ -9,7 +9,7 @@
 int main(int argc, char *argv[])
 {
   if (argc != 3) {
-    printf("argument like: ./cliUDP 172.17.223.241 9000\n");
+    printf("argument like: ./servUDP 172.17.223.241 9000\n");
     return 1;
   }
 
@@ -29,22 +29,24 @@ int main(int argc, char *argv[])
     perror("bind error");
     return 1;
   }
-
+  
   while (1) {
-    char buf[4096] = { 0 };
+    char buf[BUFSIZ] = { 0 };
     struct sockaddr_in cliaddr;
     len = sizeof(struct sockaddr_in);
-    ret = recvfrom(sockfd, buf, 4096, 0, (struct sockaddr*)&cliaddr, &len);
+    ret = recvfrom(sockfd, buf, BUFSIZ, 0, (struct sockaddr*)&cliaddr, &len);
     if (ret < 0) {
       perror("recvfrom error");
       close(sockfd);
       return 1;
     }
+    
+    printf("[%s:%d]client say: %s\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port), buf);
+    memset(buf, 0, sizeof(buf));
+    printf("server reply: ");
+    scanf("%s", buf);
 
-    printf("client say: %s\n", buf);
-    strcat(buf, ", server reply.");
-
-    len = sendto(sockfd, buf, strlen(buf), 0, (struct sockaddr*)&cliaddr, len);
+    ret = sendto(sockfd, buf, strlen(buf), 0, (struct sockaddr*)&cliaddr, len);
     if (ret < 0) {
       perror("sendto error");
       close(sockfd);
